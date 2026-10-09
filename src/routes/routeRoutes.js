@@ -1,0 +1,12 @@
+import express from "express";
+import { getRoutes, getRouteById, createRoute, updateRoute, deleteRoute } from "../controllers/routeController.js";
+import { protect } from "../middleware/authMiddleware.js";
+import { authorizeRoles } from "../middleware/roleMiddleware.js";
+const router = express.Router();
+router.use(protect);
+router.get("/", getRoutes);
+router.get("/:id", getRouteById);
+router.post("/", authorizeRoles("ADMIN"), createRoute);
+router.put("/:id", authorizeRoles("ADMIN"), updateRoute);
+router.delete("/:id", authorizeRoles("ADMIN"), deleteRoute);
+export default router;

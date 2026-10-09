@@ -1,0 +1,12 @@
+import express from "express";
+import { getVehicles, getVehicleById, createVehicle, updateVehicle, deleteVehicle } from "../controllers/vehicleController.js";
+import { protect } from "../middleware/authMiddleware.js";
+import { authorizeRoles } from "../middleware/roleMiddleware.js";
+const router = express.Router();
+router.use(protect);
+router.get("/", getVehicles);
+router.get("/:id", getVehicleById);
+router.post("/", authorizeRoles("ADMIN"), createVehicle);
+router.put("/:id", authorizeRoles("ADMIN"), updateVehicle);
+router.delete("/:id", authorizeRoles("ADMIN"), deleteVehicle);
+export default router;

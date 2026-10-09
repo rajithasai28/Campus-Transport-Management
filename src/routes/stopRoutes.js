@@ -1,0 +1,12 @@
+import express from "express";
+import { getStops, getStopById, createStop, updateStop, deleteStop } from "../controllers/stopController.js";
+import { protect } from "../middleware/authMiddleware.js";
+import { authorizeRoles } from "../middleware/roleMiddleware.js";
+const router = express.Router();
+router.use(protect);
+router.get("/", getStops);
+router.get("/:id", getStopById);
+router.post("/", authorizeRoles("ADMIN"), createStop);
+router.put("/:id", authorizeRoles("ADMIN"), updateStop);
+router.delete("/:id", authorizeRoles("ADMIN"), deleteStop);
+export default router;

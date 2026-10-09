@@ -1,0 +1,12 @@
+import express from "express";
+import { getSchedules, getScheduleById, createSchedule, updateSchedule, deleteSchedule } from "../controllers/scheduleController.js";
+import { protect } from "../middleware/authMiddleware.js";
+import { authorizeRoles } from "../middleware/roleMiddleware.js";
+const router = express.Router();
+router.use(protect);
+router.get("/", getSchedules);
+router.get("/:id", getScheduleById);
+router.post("/", authorizeRoles("ADMIN"), createSchedule);
+router.put("/:id", authorizeRoles("ADMIN"), updateSchedule);
+router.delete("/:id", authorizeRoles("ADMIN"), deleteSchedule);
+export default router;
