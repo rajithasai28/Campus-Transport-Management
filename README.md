@@ -1,55 +1,123 @@
-# P08 — Campus Transport Management
+# P08 — Campus Transport Management System
 
-A secure REST API built with Node.js, Express.js, MongoDB, and Mongoose for managing campus transport routes, stops, vehicles, and schedules.
+A REST API built using **Node.js, Express.js, MongoDB, and Mongoose** to manage campus transport routes, stops, vehicles, and schedules securely.
 
 ## Features
-- User registration and login with bcrypt password hashing
-- JWT authentication using an HTTP-only cookie (Bearer token is also accepted)
-- USER / ADMIN role-based access control
+
+- User registration and login with password hashing using bcrypt
+- JWT authentication using HTTP-only cookies
+- Role-based access control for `USER` and `ADMIN`
 - CRUD operations for routes, stops, vehicles, and schedules
-- Request validation, Mongoose schema validation, and centralized error handling
-- Users can view active transport information; admins can create, update, and delete records
-- Postman-friendly JSON responses and meaningful HTTP status codes
+- Request validation and Mongoose schema validation
+- Centralized error handling with appropriate HTTP status codes
+- Users can view active transport information
+- Admins can create, update, and delete transport records
+- API testing using Postman
 
-## Setup
-1. Install Node.js and MongoDB.
-2. Open this folder in a terminal and run:
-   ```bash
-   npm install
-   ```
-3. Copy `.env.example` to `.env` and set a long random `JWT_SECRET`.
-4. Start MongoDB locally, then run:
-   ```bash
-   npm start
-   ```
-5. Open `http://localhost:5000/` to check the API.
+## Technologies Used
 
-## Environment variables
-`PORT`, `MONGODB_URI`, `JWT_SECRET`, and optionally `ADMIN_REGISTRATION_SECRET`.
+- Node.js
+- Express.js
+- MongoDB
+- Mongoose
+- JWT
+- bcrypt
+- Postman
 
-To register an admin for a local demo, set `ADMIN_REGISTRATION_SECRET` in `.env`, then POST to `/api/auth/register-admin` with `name`, `email`, `password`, and `adminSecret`. Never expose this secret or use open admin registration in production.
+## Project Setup
 
-## Main endpoints
-All endpoints except `GET /` and `POST /api/auth/register` and `POST /api/auth/login` require authentication, except logout.
+### 1. Clone the repository
 
-| Method | Endpoint | Access | Purpose |
+```bash
+git clone https://github.com/rajithasai28/Campus-Transport-Management.git
+cd Campus-Transport-Management
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Configure environment variables
+
+Copy `.env.example` to a new file named `.env` and configure:
+
+```env
+PORT=5000
+MONGODB_URI=mongodb://127.0.0.1:27017/campus_transport
+JWT_SECRET=your_long_random_secret
+ADMIN_REGISTRATION_SECRET=your_local_admin_secret
+NODE_ENV=development
+```
+
+Use your own strong secret values. Never upload `.env` to GitHub.
+
+### 4. Start MongoDB
+
+Ensure your local MongoDB service is running.
+
+### 5. Start the server
+
+```bash
+npm start
+```
+
+The API runs at:
+
+`http://localhost:5000`
+
+Open this URL in a browser to verify that the API is running.
+
+## API Endpoints
+
+Base URL: `http://localhost:5000`
+
+### Authentication
+
+| Method | Endpoint | Access | Description |
 |---|---|---|---|
-| POST | `/api/auth/register` | Public | Register USER |
-| POST | `/api/auth/login` | Public | Login |
-| POST | `/api/auth/logout` | Public | Clear login cookie |
-| GET | `/api/auth/me` | Logged in | Current user |
-| GET | `/api/routes` | Logged in | List active routes (ADMIN sees all) |
-| GET/POST | `/api/routes/:id` / `/api/routes` | GET: logged in; POST: ADMIN | Read/create route |
-| PUT/DELETE | `/api/routes/:id` | ADMIN | Update/delete route |
-| GET/POST | `/api/stops` | GET: logged in; POST: ADMIN | List/create stops |
-| GET/PUT/DELETE | `/api/stops/:id` | GET: logged in; writes: ADMIN | Read/update/delete stop |
-| GET/POST | `/api/vehicles` | GET: logged in; POST: ADMIN | List/create vehicles |
-| GET/PUT/DELETE | `/api/vehicles/:id` | GET: logged in; writes: ADMIN | Read/update/delete vehicle |
-| GET/POST | `/api/schedules` | GET: logged in; POST: ADMIN | List/create schedules |
-| GET/PUT/DELETE | `/api/schedules/:id` | GET: logged in; writes: ADMIN | Read/update/delete schedule |
+| POST | `/api/auth/register` | Public | Register a user |
+| POST | `/api/auth/login` | Public | Log in |
+| POST | `/api/auth/logout` | Public | Clear the login cookie |
+| GET | `/api/auth/me` | Authenticated | Get current user |
+| POST | `/api/auth/register-admin` | Secret required | Register an admin for local testing |
 
-## Example JSON bodies
-Route:
+### Transport Management
+
+| Resource | Method | Endpoint | Access |
+|---|---|---|---|
+| Routes | GET | `/api/routes` | Authenticated |
+| Routes | GET | `/api/routes/:id` | Authenticated |
+| Routes | POST | `/api/routes` | ADMIN |
+| Routes | PUT | `/api/routes/:id` | ADMIN |
+| Routes | DELETE | `/api/routes/:id` | ADMIN |
+| Stops | GET | `/api/stops` | Authenticated |
+| Stops | GET | `/api/stops/:id` | Authenticated |
+| Stops | POST | `/api/stops` | ADMIN |
+| Stops | PUT | `/api/stops/:id` | ADMIN |
+| Stops | DELETE | `/api/stops/:id` | ADMIN |
+| Vehicles | GET | `/api/vehicles` | Authenticated |
+| Vehicles | GET | `/api/vehicles/:id` | Authenticated |
+| Vehicles | POST | `/api/vehicles` | ADMIN |
+| Vehicles | PUT | `/api/vehicles/:id` | ADMIN |
+| Vehicles | DELETE | `/api/vehicles/:id` | ADMIN |
+| Schedules | GET | `/api/schedules` | Authenticated |
+| Schedules | GET | `/api/schedules/:id` | Authenticated |
+| Schedules | POST | `/api/schedules` | ADMIN |
+| Schedules | PUT | `/api/schedules/:id` | ADMIN |
+| Schedules | DELETE | `/api/schedules/:id` | ADMIN |
+
+## Example Request
+
+### Create a Route
+
+Method: `POST`
+
+Endpoint: `/api/routes`
+
+Body → raw → JSON:
+
 ```json
 {
   "routeNumber": "R01",
@@ -60,23 +128,32 @@ Route:
   "status": "ACTIVE"
 }
 ```
-Stop:
-```json
-{ "name": "Main Gate", "location": "College Main Gate", "route": "ROUTE_MONGODB_ID", "sequence": 1, "status": "ACTIVE" }
-```
-Vehicle:
-```json
-{ "registrationNumber": "TS09AB1234", "vehicleType": "Bus", "capacity": 40, "route": "ROUTE_MONGODB_ID", "status": "ACTIVE" }
-```
-Schedule:
-```json
-{ "route": "ROUTE_MONGODB_ID", "vehicle": "VEHICLE_MONGODB_ID", "departureTime": "08:00", "arrivalTime": "09:00", "days": ["MON", "TUE", "WED", "THU", "FRI"], "availability": 40, "status": "ACTIVE" }
-```
-Use actual MongoDB document IDs for references.
 
-## Testing
-Test registration/login first in Postman. Keep the cookie from login (or use `Authorization: Bearer <token>` if you extract a token in your own client). Then test CRUD endpoints. Create related records in this order: route, stop/vehicle, schedule.
+Create a route before creating its related stops, vehicles, and schedules. Use the actual MongoDB document IDs for references.
 
-## Notes
-- Do not commit `.env` or `node_modules` to GitHub.
-- This project is a local learning/hackathon implementation, not a production deployment. Add stricter business-rule checks and automated tests before production use.
+## Testing with Postman
+
+1. Start the backend and MongoDB.
+2. Register a user and log in.
+3. Create an admin account using the configured admin registration secret.
+4. Test route, stop, vehicle, and schedule CRUD operations as an admin.
+5. Log in as a normal user and verify that viewing records is allowed while write operations return `403 Forbidden`.
+6. Verify the stored records in MongoDB.
+
+## HTTP Status Codes
+
+- `200 OK` — Request completed successfully
+- `201 Created` — Record created
+- `400 Bad Request` — Invalid input or resource ID
+- `401 Unauthorized` — Missing or invalid authentication
+- `403 Forbidden` — Insufficient permissions
+- `404 Not Found` — Resource or endpoint not found
+- `409 Conflict` — Duplicate unique value
+
+## Security Notes
+
+- Passwords are hashed using bcrypt.
+- Authentication uses JWTs stored in HTTP-only cookies.
+- Admin registration requires a configured secret.
+- Keep `.env` and `node_modules` out of GitHub.
+- This project is intended for learning and hackathon demonstration. Additional security hardening and automated tests are recommended before production deployment.
